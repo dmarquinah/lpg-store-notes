@@ -143,7 +143,7 @@ See [[frontend-bloat-analysis]] for the full diagnosis. Headline drivers:
 6. **Per-role-per-feature stores** — three inventory stores (`adminInventoryStore`, `adminInventoryTransactionStore`, `deliveryInventoryStore`) where one module-scoped store would do.
 
 ### v2 plan (high level)
-**Update 2026-05-08**: v2 skeleton landed via [[../specs/frontend-bootstrap/v2-skeleton]]. v1 is archived under `lpg-frontend-vue/legacy/` (read-only); a fresh `src/` is in place with auth + role-stub homes. Build is green, ~38 KB gzipped main bundle.
+**Update 2026-05-08**: v2 skeleton landed via [[../specs/bootstrap/v2-skeleton/frontend]]. v1 is archived under `lpg-frontend-vue/legacy/` (read-only); a fresh `src/` is in place with auth + role-stub homes. Build is green, ~38 KB gzipped main bundle.
 
 ### v2 stack (current)
 

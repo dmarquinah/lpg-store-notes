@@ -1,3 +1,6 @@
+---
+last-updated: 2026-06-06
+---
 # Inventory — lpg-store
 
 ---
@@ -24,7 +27,7 @@ Read these before working on inventory specs:
 
 | Slug | Status | Summary |
 |------|--------|---------|
-| [[inventory-foundation]] | draft | Ledger-first inventory with three-state assignment workflow, six transaction kinds, customer empty-debt ledger, reconciliation/discrepancy reporting. The product's core. |
+| [[inventory-foundation/index\|inventory-foundation]] | done · backend ✓ frontend ✓ | Ledger-first inventory with three-state assignment workflow, six transaction kinds, customer empty-debt ledger, reconciliation/discrepancy reporting. The product's core. |
 
 ## Edge cases the architecture must natively express
 
@@ -35,9 +38,9 @@ These were validated against v1 and the user's domain knowledge before drafting 
 - **E3** Take 1 full, return 2 empties (settles prior debt): inventory `{−1 full, +2 empty}`; customer `−1 empty owed`.
 - **E4** Walk-in cash sale, no customer record: same as E1 on inventory; nothing on the customer side.
 - **E5** Customer brings empty back later, no purchase: inventory `{0 full, +1 empty}`; customer `−1 empty owed`.
-- **E6** Driver receives day-opening assignment: ledger `opening` rows from store snapshot.
+- **E6** Driver receives day-opening assignment: paired `opening` transfer — `{−full}` on the store's `location` holder, `{+full}` on the driver's `assignment` holder (ADR-013).
 - **E7** Failed delivery returns tanks to driver: reversal transaction(s) on the same assignment.
-- **E8** Supplier delivers fulls in exchange for empties: store-side `purchase` deltas.
+- **E8** Supplier delivers fulls in exchange for empties: `purchase` row on the store's `location` holder, not tied to any driver (ADR-013).
 - **E9** Damaged/lost tank: `adjustment` ledger row with note.
-- **E10** Day-end consolidation: next day's opening = today's closing fulls/empties; empty-debt does **not** carry (lives on customers, not assignments).
+- **E10** Day-end consolidation: `carry` hands the truck's leftovers back to the **location**; the operator then restocks from the provider and **opens the next day explicitly** with chosen quantities — so next-day opening need **not** equal today's closing (ADR-014). Empty-debt does **not** carry (lives on customers, not assignments).
 - **E11** Reconciliation discrepancy at day-end: physical count vs ledger mismatch logged as `reconciliation` transaction.

@@ -117,7 +117,7 @@ The screen count was small. The bloat was **organizing by user role at every lay
 
 ## What v2 takes from this
 
-The first frontend spec to apply these is `[[../specs/frontend-bootstrap/v2-skeleton]]` (status: draft). It bakes the lessons into rules:
+The first frontend spec to apply these is `[[../specs/bootstrap/v2-skeleton/frontend]]` (status: draft). It bakes the lessons into rules:
 
 - **D1, D6, D7** are killed by **module-by-domain layout** (`src/modules/<feature>/` with role-aware variants inside) — analogous to backend [[patterns/module-template]] but adapted for Vue/Pinia.
 - **D2** is killed by **dropping i18n** entirely until a real second-language user appears.

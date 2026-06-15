@@ -1,3 +1,6 @@
+---
+last-updated: 2026-06-04
+---
 # Auth — lpg-store
 
 ---
@@ -19,4 +22,4 @@ Read before working on auth specs:
 
 | Slug | Status | Summary |
 |------|--------|---------|
-| [[auth-foundation]] | done | Login + JWT + role-based authorization. Single users table, delivery_profile sub-table, admin-issued invite tokens, Redis logout blocklist, BOOTSTRAP_TOKEN-gated developer creation. |
+| [[auth-foundation/index\|auth-foundation]] | done · backend ✓ frontend ✓ | Login + JWT + role-based authorization. Single users table, delivery_profile sub-table, admin-issued invite tokens, Redis logout blocklist, BOOTSTRAP_TOKEN-gated developer creation. |
