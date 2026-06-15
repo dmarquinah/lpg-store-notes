@@ -2,7 +2,7 @@
 project: lpg-store
 domain: specs
 category: stores
-last-updated: 2026-06-05
+last-updated: 2026-06-14
 ---
 
 # Stores & Catalog — lpg-store
@@ -23,7 +23,7 @@ Read these before working on stores/catalog specs:
 | Slug | Status | Summary |
 |------|--------|---------|
 | [[stores-and-catalog/index\|stores-and-catalog]] | done · backend ✓ frontend ✓ | Foundational reference data: `stores`, `store_assignments`, `tank_types`, `inventory_items` + single-store seed + read API (backend); tabbed admin catalog UI (frontend). |
-| [[store-management/index\|store-management]] | approved · backend ◻ frontend ◻ | Admin **write surface** for stores + store↔user assignments (create/edit store, assign/deactivate users). No schema change — endpoints + UI only. Unblocks multi-location testing (a 2nd store for transfer/switcher; operator assignments for branch scoping). |
+| [[store-management/index\|store-management]] | done · backend ✓ frontend ✓ | Admin **write surface** for stores + store↔user assignments (create/edit store, assign/deactivate users). No schema change — endpoints + UI only. Unblocks multi-location testing (a 2nd store for transfer/switcher; operator assignments for branch scoping). |
 
 ## Notes
 

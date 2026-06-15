@@ -5,7 +5,7 @@ type: spec-track
 spec: orders-queue-history-search
 repo: lpg-backend
 kind: backend
-track-status: not-started
+track-status: done
 last-updated: 2026-06-14
 ---
 
@@ -87,3 +87,12 @@ Context (read; do not needlessly modify):
 ## Implementation Notes
 
 <!-- Format: [YYYY-MM-DD] [repo-name] description of what was done -->
+
+[2026-06-14] [lpg-backend] Backend track **done**. Two additive changes, both shipped:
+
+- **Accent-insensitive customer search (the shared fix).** `customers/repository.ts` `list()` now matches with `unaccent(name) ILIKE unaccent(pat)` / `unaccent(phone) ILIKE unaccent(pat)` (still case-insensitive, still substring, still min-2). One code path → fixes the customers list **and** the order-creation picker ("Maria" ⇄ "María"). Backed by hand-authored migration **`0009_unaccent_search.sql`** (`CREATE EXTENSION IF NOT EXISTS unaccent;`, idempotent, public schema) — drizzle doesn't track extensions, so journal + `0009_snapshot.json` (prevId = 0008's id) were added by hand to keep the generate chain continuous. Applied to the dev DB; spot-checked `unaccent('María')→'Maria'`, forward + reverse ILIKE both true.
+- **`GET /orders` `search` param** (min 2, `searchSchema` mirrors customers). `ListOrdersFilter.search` → a single `or(...)` over four columns: `customers.name`/`phone` (the existing leftJoin) + `orders.customerNameSnapshot`/`customerPhoneSnapshot` (walk-ins). It's one element of the existing `and(...conds)`, so it **composes** with status/date/`storeId` and the role/branch scope and can't widen (the empty-scope short-circuits still return `[]` first). Single query, no N+1. Threaded through `service.listOrders` (one line).
+
+Tests mirror the SQL in the in-memory fakes (a small JS `unaccent` = NFD-strip + lowercase; `FakeOrdersRepository` gained a `customerIdentities` map so the registered-customer join is exercised). Added the spec's 3 checks: (a) customers accent both-directions; (b) orders `?search=` over registered + walk-in composing with `status`; (c) search intersects the branch scope (operator never sees another branch). **73 tests** (was 70), typecheck + lint + build all green.
+
+_Out of scope (as speced): no functional `unaccent` index (not IMMUTABLE; small dataset — perf follow-up). Frontend track (Activos/Historial split, date-range, search box) remains._

@@ -2,7 +2,7 @@
 project: lpg-store
 domain: specs
 spec-layout: folder
-last-updated: 2026-06-14
+last-updated: 2026-06-15
 ---
 
 # Specs — lpg-store
@@ -12,18 +12,18 @@ last-updated: 2026-06-14
 ## In Progress
 | Spec | Category | Tracks | Summary |
 |------|----------|--------|---------|
-| _(none)_ | | | |
 
 ## Backlog
 | Priority | Spec | Category | Summary |
 |----------|------|----------|---------|
-| next | [[stores/store-management/index\|store-management]] (backend ◻, frontend ◻) | stores | **approved.** Admin write surface for **stores + store↔user assignments** (create/edit store, assign/deactivate users). No schema change — endpoints + UI only. **Unblocks multi-location testing**: a 2nd store for transfer/switcher, operator assignments for branch scoping. Stores-CRUD slice alone unblocks transfer + the switcher. |
-| next | [[orders/orders-queue-history-search/index\|orders-queue-history-search]] (backend ◻, frontend ◻) | orders | **approved.** Make `/pedidos` scale: **Activos/Historial** split (live queue by default; finished orders by **date range**), free-text **customer search** on `GET /orders`, and an **accent-insensitive** (`unaccent`) search fix that also repairs the order-creation picker. Backend already supports date/status/store/limit — only `search` + the accent fix are new. |
 | low | deployment/first-vps-deploy | deployment | First production deploy of the v2 skeleton to the VPS. Validates the CI/CD pipeline end-to-end. _(folder spec to be created)_ |
 
 ## Done (recent)
 | Spec | Category | Tracks | Summary | Completed |
 |------|----------|--------|---------|-----------|
+| [[admin/org-management/index\|org-management]] | admin | backend ✓ · frontend ✓ | Unified admin **Organización** view: location-centric board of stores with their assigned operators/drivers (aggregate `GET /catalog/stores-with-assignments`), with store CRUD, per-store assign/**Quitar**, all-users area (Global / Sin-tienda flags, inline edit), and **Invitar usuario** (`POST /auth/register` + copyable `/invite/:token` link). New `organization` module *composes* catalog/users/auth. **Replaced** the standalone `/usuarios` page (→ redirect) + Catálogo *Tiendas*/*Asignaciones* tabs. typecheck + build green. | 2026-06-15 |
+| [[orders/orders-queue-history-search/index\|orders-queue-history-search]] | orders | backend ✓ · frontend ✓ | Orders queue split into **Activos** (live, default) / **Historial** (finished, by date range): segmented Tabs, Desde/Hasta `DatePicker`s (default today, no pager), debounced ≥2-char customer **search** box → `GET /orders?search=` (accent-insensitive end-to-end via the backend `unaccent` fix). Multi-status “Todos” fans out per status in the store (backend `status` is single-enum). Admin store switcher + Tienda column + ownership/transfer affordances preserved. typecheck + build green. | 2026-06-14 |
+| [[stores/store-management/index\|store-management]] | stores | backend ✓ · frontend ✓ | Admin write surface for stores + store↔user assignments. Backend (62 tests): `POST`/`PATCH /catalog/stores` (unique active names) + `POST`/`PATCH /catalog/store-assignments` (any role, dup active link → 409, soft-deactivate), all admin-gated. Frontend: catalog **Tiendas** tab → create/edit dialog (+ activate/deactivate, show-inactive); new **Asignaciones** tab (assign operator/delivery ↔ store, list, deactivate). New stores flow straight into the orders switcher/transfer. | 2026-06-14 |
 | [[orders/orders-multi-location/index\|orders-multi-location]] | orders | backend ✓ · frontend ✓ | Location + ownership dimension on orders: `storeId` (owning branch) + `ownerId` (owner-gated assign/cancel/transfer; auto-claim on assign); store-scoped operator queues via `store_assignments` (admin = global, `?storeId=` switcher); `POST /:id/transfer` pre-dispatch branch handoff; atomic CAS transitions (409 on lost-update, ADR-016). Frontend: branch switcher + Tienda column, OwnershipBadge + gated actions, TransferDialog, admin owning-branch create selector, 409 re-sync. 59 backend tests. | 2026-06-14 |
 | [[ui-design/design-system/index\|design-system]] | ui-design | frontend ✓ | Piloto design system + UI overhaul for low-tech-literacy users: petrol+flame token palette (light+dark, semantic success/warning/info), bundled Public Sans, 14px type floor + ≥44px touch targets, theme toggle (`piloto-theme`), shared `PageHeader`/`Spinner`/`EmptyState` + `formatMoney`, restyle of the app shell + all 7 modules (DeliveryListView → phone-first cards). `eng/design-system.md` is the canonical convention doc. | 2026-06-12 |
 | [[orders/orders-foundation/index\|orders-foundation]] | orders | backend ✓ · frontend ✓ | Order lifecycle `pending → delivered` (+cancelled/failed); inventory moves at delivery via `recordSale`/`recordItemSale` in one `db.transaction()`; catalog-default override-able pricing; partial payments + netted customer balance; walk-ins; agreed payment method at registry. Backend module + 54 tests; frontend `orders` module (operator entry wizard + queue + detail + driver delivery view). | 2026-06-10 |
@@ -48,6 +48,7 @@ Spec categories are created on-the-fly under `specs/{category}/`. Each new spec 
 - `deployment/` — to be created when the first spec in each lands
 
 - `ui-design/` — created 2026-06-12 with `design-system` (design system + full UI overhaul; frontend-only)
+- `admin/` — created 2026-06-14 with `org-management` (cross-cutting admin console: users + stores + assignments + invites)
 
 ## Status Legend
 

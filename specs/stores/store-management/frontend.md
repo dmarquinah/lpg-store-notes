@@ -5,7 +5,7 @@ type: spec-track
 spec: store-management
 repo: lpg-frontend-vue
 kind: frontend
-track-status: not-started
+track-status: done
 last-updated: 2026-06-14
 ---
 
@@ -59,3 +59,18 @@ Context (read):
 ## Implementation Notes
 
 <!-- Format: [YYYY-MM-DD] [repo-name] description of what was done -->
+
+[2026-06-14] [lpg-frontend-vue] Frontend track implemented. Extended the existing `catalog` vertical module — no new routes/nav (Catálogo already admin-gated).
+
+- **types.ts** — added `CreateStorePayload` (name + optional address/phone), `UpdateStorePayload` (all-optional; `address`/`phone` `string | null` so an explicit `null` clears the column, mirroring the backend `.nullable()` update schema), `CreateStoreAssignmentPayload` ({storeId,userId}), and `StoreResponse`/`StoreAssignmentResponse` envelopes.
+- **service.ts** — `createStore` (`POST /catalog/stores`), `updateStore` (`PATCH /catalog/stores/:id`), `createStoreAssignment` (`POST /catalog/store-assignments`), `setStoreAssignmentActive` (`PATCH /catalog/store-assignments/:id`). Mirror the existing `createTankType`/`createItem` shape.
+- **store.ts** — actions `createStore`/`updateStore` (refetch `fetchStores`), `createStoreAssignment`/`deactivateStoreAssignment` (refetch `fetchStoreAssignments(showInactive)`), each toggling `loading`/`error`. The apiClient already maps **409 → ConflictError** carrying the backend Spanish message, and `messageFrom` surfaces it directly — dup store name / dup active assignment show the friendly text in the dialog Alert with no extra wiring.
+- **StoreFormDialog.vue** (new) — mirrors `TankTypeCreateDialog`; `store?` prop → create (null) / edit. Fields name (≤120) + optional address (≤255) / phone (≤32), client-side validation mirroring backend Zod; an **Activa** Switch in edit mode (activate/deactivate). Create omits blank optionals; edit sends blanks as `null` to clear.
+- **StoreAssignmentDialog.vue** (new) — two `Select`s (mirroring `TransferDialog`): **user** (reuses `useUsersStore`, fetched `{active:true}`, client-filtered to active **operator/delivery**) + **store** (active catalog stores). Submit → `createStoreAssignment`; 409 renders in the Alert.
+- **CatalogView.vue** — Tiendas tab now has **Nueva tienda** + per-row **Editar** (Acciones column; removed the read-only note); new **Asignaciones** tab (Usuario · Rol · Tienda · Estado · Desactivar) with an **Asignar** button. `fetchAll()` adds `fetchStoreAssignments(showInactive)`; the show-inactive toggle re-fetches all four lists. Design-system compliant (PageHeader, TableEmpty/Spinner, success/outline badges, tokens only, canonical dialog chrome).
+
+After creating a store it's immediately usable in the orders store switcher / TransferDialog (both call `catalog.fetchStores`) — no extra wiring.
+
+Gates green: typecheck (`vue-tsc -b --noEmit`) ✓ · build (`vue-tsc -b && vite build`, PWA precache 53 entries / 673.80 KiB) ✓. No test runner wired in this repo — manual both-theme smoke left to the operator.
+
+[2026-06-14] [lpg-frontend-vue] All criteria for this repo met. Independent validation confirmed all 3 frontend acceptance criteria; the assignee picker restricting to operator/delivery is intentional per this track's Technical Notes (backend allows any role, frontend offers the scoped roles). Gates green (typecheck + build). Frontend track **done** → both tracks done → spec **done**.

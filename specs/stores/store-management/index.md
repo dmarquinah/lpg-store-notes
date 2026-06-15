@@ -3,7 +3,7 @@ project: lpg-store
 domain: specs
 type: spec
 spec-layout: folder
-status: approved
+status: done
 depends-on:
   - "[[../stores-and-catalog/index]]"
   - "[[../../users/users-crud/index]]"
@@ -95,8 +95,8 @@ Detailed endpoints and file lists live in [[backend]] and [[frontend]].
 
 | Track | Repo | Kind | Status |
 |-------|------|------|--------|
-| [[backend]] | lpg-backend | backend | not-started |
-| [[frontend]] | lpg-frontend-vue | frontend | not-started |
+| [[backend]] | lpg-backend | backend | done |
+| [[frontend]] | lpg-frontend-vue | frontend | done |
 
 > **Porting order:** backend first (stores create/edit + assignment create/deactivate),
 > frontend right after. The **stores CRUD** slice alone already unblocks transfer +

@@ -5,7 +5,7 @@ type: spec-track
 spec: orders-queue-history-search
 repo: lpg-frontend-vue
 kind: frontend
-track-status: not-started
+track-status: done
 last-updated: 2026-06-14
 ---
 
@@ -60,3 +60,11 @@ Context (read):
 ## Implementation Notes
 
 <!-- Format: [YYYY-MM-DD] [repo-name] description of what was done -->
+
+- [2026-06-14] [lpg-frontend-vue] Implemented the full frontend track in the `orders` module:
+  - `types.ts`: added `search?: string` and a frontend-only `statuses?: OrderStatus[]` to `ListOrdersFilters` (the latter is the union-fetch convenience; never serialized).
+  - `service.ts`: `listQuery` now emits `search` (only `status`, never `statuses`, reaches the wire).
+  - `store.ts`: `fetchOrders` destructures `statuses` and, when present, fans out one `GET /orders?status=…` per status (backend has only a single-`status` enum), then merges sorted by `createdAt` desc → `id` desc to match the backend ordering. Single-status / no-status path unchanged, so `refreshAfterMutation` still works.
+  - `OrdersListView.vue` (bulk): **Activos/Historial** segmented control via the shared `Tabs` primitive; `ACTIVE_STATUSES`/`HISTORY_STATUSES` sets; status dropdown narrowed to `modeStatuses` ("Todos" → the mode's union); **Desde/Hasta** shared `DatePicker`s shown only in Historial, defaulted to `todayISO()` on entering it (clearable); debounced (300ms, ≥2-char) customer **search** box (mirrors `CustomerSelect`) in both modes; mode-switch resets status + seeds/clears the range; one batched `watch([...])` → single re-fetch per tick; `onMounted` seeds Activos via `applyFilters` (never a no-status fetch of the unbounded history). Admin store switcher, Tienda column, OwnershipBadge, and assign/dispatch/cancel/transfer affordances all preserved. Empty state shows "Sin coincidencias." when a search term is active.
+  - Verified: `npm run typecheck` + `npm run build` pass. Validation agent confirmed all 5 acceptance criteria + correctness concerns (no unbounded fetch, no `statuses` leak, debounce edge cases, single batched fetch).
+  - Order-creation customer picker needs no FE change — it consumes the backend `unaccent` fix for free ("Maria" ⇄ "María"); manual smoke pending against a running backend.

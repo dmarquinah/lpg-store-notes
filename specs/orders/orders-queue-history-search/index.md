@@ -3,7 +3,7 @@ project: lpg-store
 domain: specs
 type: spec
 spec-layout: folder
-status: approved
+status: done
 depends-on:
   - "[[../orders-foundation/index]]"
   - "[[../orders-multi-location/index]]"
@@ -104,8 +104,8 @@ Detailed data model, endpoints, and file lists live in [[backend]] and
 
 | Track | Repo | Kind | Status |
 |-------|------|------|--------|
-| [[backend]] | lpg-backend | backend | not-started |
-| [[frontend]] | lpg-frontend-vue | frontend | not-started |
+| [[backend]] | lpg-backend | backend | done |
+| [[frontend]] | lpg-frontend-vue | frontend | done |
 
 > **Porting order:** backend first (the `search` param + `unaccent` fix), frontend
 > right after (it consumes both).

@@ -5,7 +5,7 @@ type: spec-track
 spec: store-management
 repo: lpg-backend
 kind: backend
-track-status: not-started
+track-status: done
 last-updated: 2026-06-14
 ---
 
@@ -66,3 +66,15 @@ Context (read; do not needlessly modify):
 ## Implementation Notes
 
 <!-- Format: [YYYY-MM-DD] [repo-name] description of what was done -->
+
+[2026-06-14] [lpg-backend] Backend track done. Admin write surface added to the existing `catalog` module — no schema/migration change (tables already existed).
+
+- **types.ts** — `createStoreSchema` (name ≤120, address? ≤255, phone? ≤32), `updateStoreSchema` (all-optional name/address/phone/active; address/phone `.nullable()` so an explicit `null` clears them; `.refine` requires ≥1 field), `createStoreAssignmentSchema` ({storeId,userId} positive ints), `updateStoreAssignmentSchema` ({active}), and a shared `idParamSchema` (`z.coerce.number().int().positive()`) for `:id` params.
+- **repository.ts** — extended `ICatalogRepository` + class: `createStore`, `updateStore` (→ Store|null), `getStoreById`, `findActiveStoreByName(name, excludeId?)` (case-insensitive `lower()=lower()`, active-scoped), `findUser`, `findActiveAssignment`, `createStoreAssignment` (maps PG `23505` → `ConflictError` as a race backstop), `setStoreAssignmentActive`, `getStoreAssignmentDetail` (reuses the existing 3-table join, filtered by id, no active filter). Added `CatalogUser` + `StorePatch` exported types.
+- **service.ts** — `createStore`/`updateStore` enforce **unique active store names** via a `findActiveStoreByName` pre-check → 409 (owner override: no duplicates). `updateStore` re-checks the name on rename and on reactivation (`active:true`); builds a partial patch (only provided keys). `createStoreAssignment` validates store+user exist (404 each), allows **any role** (owner override), dup active link → 409, returns the enriched `StoreAssignmentDetail` built from the validated store+user. `setStoreAssignmentActive` soft-deactivates; on reactivation re-runs the dup-check.
+- **routes.ts** — `POST /stores` (201), `PATCH /stores/:id` (200), `POST /store-assignments` (201), `PATCH /store-assignments/:id` (200), all `requireRole('admin')` (developer bypasses via the guard).
+- **__tests__** — extended `FakeCatalogRepository` with the new methods + a `seedUser` helper + a `patchJson` HTTP helper; 3 new lifecycle tests (store create/edit/dup-409/404; assignment create/dup-409/404/deactivate/re-link; non-admin 403). Catalog suite 4 → 7 tests; **project 59 → 62 tests**.
+
+**Owner-decided open questions:** (1) store names **unique** (not duplicates allowed); (2) **any** role assignable (not restricted to operator/delivery). Both leans in `index.md` were overridden accordingly.
+
+Gates green: typecheck ✓ · biome lint ✓ · 62 tests ✓ · build ✓. Independent validation confirmed all 8 backend criteria, no gaps. Note: create-store uniqueness is an app-level pre-check only (no DB unique index, since no schema change is allowed) — a small TOCTOU window acceptable for this low-write admin surface. Frontend track remains.
