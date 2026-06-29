@@ -1,7 +1,7 @@
 ---
 project: lpg-store
 domain: eng
-last-updated: 2026-06-12
+last-updated: '"2026-06-17"'
 ---
 
 # Piloto Design System
@@ -43,6 +43,7 @@ Status colors carry **meaning only** (state, alerts, debt) — never decoration.
 | Payment | unpaid → `warning` · partial → `info` · paid → `success` |
 | Inventory assignment | open → `info` · closed → `secondary` · carried → `outline` |
 | Customer | active → `success` · inactive → `outline` · monetary debt → `destructive` · empty-tank debt → `warning` |
+| Accounting registry | open → `info` · closed → `secondary` |
 
 New domains extend this table here first, then in code (per-module `*_VARIANTS` records, e.g. `orders/orderLabels.ts`).
 
@@ -79,6 +80,8 @@ Shared chrome lives in `src/components/app/` (flat, no barrels); shadcn-vue prim
 - **Money:** always `formatMoney()` from `src/lib/format.ts` (`S/ 120.00`). No inline `toFixed` formatting.
 - **Icons + labels:** every nav item and primary action shows a visible Spanish label; icons never appear alone for primary actions (icon-only is acceptable for tertiary/utility controls with `aria-label`, e.g. the theme toggle).
 - **Row links:** clickable table rows use `Button as-child > RouterLink` ("Ver") — not bare `@click` rows.
+- **Data tables:** every data table uses **`ResponsiveTable`** (`components/app/ResponsiveTable.vue`) — a real `<table>` at `sm+` and a **stacked label/value card per row below `sm`** (phone-first; never an undiscoverable horizontal table scroll). Declare `:columns` once (`{ key, label, align?, class? }` — `align: 'right'` for numeric/money), render each cell via a `#cell:{key}` slot, and put any trailing actions in `#actions` (a trailing cell on desktop, a footer button row on mobile). It owns the loading (`:loading` + `loading-text`) and empty (`empty-text`) states, so views stop hand-rolling `TableEmpty` rows. **Do not place a bare `ui/table` `<Table>` directly in a view** — `ui/table/*` stays a primitive that `ResponsiveTable` composes. Introduced by [[../specs/ui-design/mobile-layout-audit/index|mobile-layout-audit]].
+- **Phone-first layout (≤640px is the primary case — this is a field PWA):** the app must never scroll horizontally at 390px. Tab strips (`TabsList`) scroll horizontally rather than clip a tab. Filter/toolbar controls are `w-full md:w-…` (full-width on mobile, fixed on desktop) so a `flex flex-wrap` bar stacks cleanly instead of cascade-wrapping. The `AppLayout` top bar collapses its right cluster on `<sm` (icon-only logout, identity relocated to the drawer).
 
 ## 6. Hard rules (review checklist)
 
@@ -92,6 +95,7 @@ Shared chrome lives in `src/components/app/` (flat, no barrels); shadcn-vue prim
 8. New screens use PageHeader / TableEmpty / EmptyState / Spinner / formatMoney — no parallel patterns.
 9. Status colors = meaning only; mapping table extended here first.
 10. No new UI framework or component library; shadcn-vue + Tailwind + lucide only.
+11. Phone-first: data tables use `ResponsiveTable` (no bare `<Table>` in views); tab strips scroll, never clip; filter controls are `w-full md:w-…`; nothing scrolls the page sideways at 390px. Verify at phone width in both themes.
 
 ## Related Files
 
@@ -99,5 +103,5 @@ Shared chrome lives in `src/components/app/` (flat, no barrels); shadcn-vue prim
 - `lpg-frontend-vue/tailwind.config.js` — token→class mapping, type scale, font
 - `lpg-frontend-vue/src/lib/theme.ts` — theme persistence/toggle
 - `lpg-frontend-vue/index.html` — FOUC guard, theme-color metas
-- `lpg-frontend-vue/src/components/app/` — PageHeader, Spinner, EmptyState
+- `lpg-frontend-vue/src/components/app/` — PageHeader, Spinner, EmptyState, ResponsiveTable
 - `lpg-frontend-vue/src/lib/format.ts` — formatMoney

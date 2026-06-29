@@ -25,3 +25,4 @@ Read these vault docs before working on specs in this category:
 | Slug | Status | Summary |
 |------|--------|---------|
 | [[design-system/index\|design-system]] | done | Design system + full UI overhaul: tokens (color scheme, type scale, spacing/touch targets), documented conventions, and a restyle pass over the app shell and all 7 modules. |
+| [[mobile-layout-audit/index\|mobile-layout-audit]] | done | Phone-first responsive sweep over all pages: a shared **`ResponsiveTable`** (rows→cards <640px) replacing 17 raw tables, scroll/wrap tab strips, full-width filter controls, and an AppLayout header that stops cramming on 390px. Layout only — no token/behavior change. |
