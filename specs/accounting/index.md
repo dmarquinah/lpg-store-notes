@@ -28,3 +28,13 @@ Read these before working on accounting specs:
 |------|--------|---------|
 | [[accounting-registry/index\|accounting-registry]] | done · backend ✓ frontend ✓ | Per-store **closing register** that groups a period's money events: auto-aggregates ingress (delivered-order payments by method) + egress (provider purchases + surcharges), allows free-form manual ingress/egress lines, and **closes** into a frozen snapshot. Foundation for the later weekly/monthly evaluation. |
 | [[registry-source-drilldown/index\|registry-source-drilldown]] | done · backend ✓ frontend ✓ | Read-only **verification drill-down**: each registry block (ingress by method, egress provider) expands into its contributing source records grouped by **business day** (the manual "sum it day by day" check, in-place). New line-level read ports (composition, no duplicated queries); day subtotals reconcile to the block totals; **frozen into the snapshot** for closed registries (ADR-018 extended to detail). |
+
+## Cross-category changes affecting accounting
+
+- **[[../providers/provider-management/index]]** (providers category, in progress
+  2026-07-08) **redefines registry egress to cash-basis.** Egress moves from
+  *purchase value* to *cash actually paid to providers* (`provider_payments`),
+  adding **Compras recibidas** + **Deuda a proveedores** reconciling lines. If you
+  are exploring why the egress formula / `AccountingEgressSource` changed, read
+  that spec's backend track. The done [[accounting-registry/index]] carries a
+  matching "Follow-up Changes" note.

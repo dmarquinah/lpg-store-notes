@@ -91,3 +91,23 @@ Detailed backend design lives in [[backend]]; the admin registry screens in [[fr
 - **Permission split.** Admin/developer manage every store's registers globally. **Operators** may open a register and add/remove **manual entries** for **their own store(s)** (`storeIdsForUser`), and view that store's detail. **Closing a register is admin/developer only** (the operator records, the admin finalizes — same record-then-confirm split as the day-handoff). Cross-store access → 404/403.
 - **Snapshot storage** — denormalized totals columns vs a JSON snapshot column on `accounting_registries`, or a side table. Functionally equivalent; decide at implementation.
 - **Egress value = total cash paid to the provider** = `purchase_price × qty` + `purchase_surcharges.amount`.
+
+## Follow-up Changes (post-completion)
+
+- **2026-07-08 — egress becomes cash-basis (see [[../../providers/provider-management/index]]).**
+  This spec shipped egress as **purchase value** (provider `kind='purchase'`
+  transactions valued at `COALESCE(unit_cost, holder snapshot) × qty`), assuming
+  each purchase was paid in cash at purchase time. The `provider-management` spec
+  introduces **credit purchases** (money owed to a provider, partial payments),
+  which makes purchase-value diverge from cash actually paid. Under
+  `provider-management` the registry egress is redefined:
+  - **Egress (cash out)** = sum of `provider_payments` in the period (by payment
+    business date), replacing the purchase-value egress.
+  - Two new reconciling breakdown lines: **Compras recibidas** (goods received =
+    the old purchase-value figure) and **Deuda a proveedores** (running balance /
+    period delta), so `pagos + Δdeuda = compras` holds.
+  - Closed-registry snapshots freeze all three figures like the existing egress.
+  The `computeBreakdown` / `computeDrilldown` / `listRegistries` egress paths and
+  the `AccountingEgressSource` port (this spec's `purchaseCostsForStorePeriod`
+  etc.) are extended there — that spec's [[../../providers/provider-management/backend]]
+  track is the source of truth for the new formula.
